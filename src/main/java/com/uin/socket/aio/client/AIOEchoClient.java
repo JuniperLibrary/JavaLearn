@@ -149,7 +149,7 @@ public class AIOEchoClient {
     AIOClientThread client = new AIOClientThread();
     new Thread(client).start();
     while (client.sendMessage(InputUtil.getString("请输入要发送的信息："))) {
-      ;
+
     }
   }
 }

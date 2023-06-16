@@ -78,6 +78,7 @@ class SocketClientChannelThread implements Runnable {
   }
 }
 
+@Slf4j
 class EchoServerHandle implements AutoCloseable {    // 定义服务器端的服务处理类
 
   private final ExecutorService executorService;
@@ -92,7 +93,7 @@ class EchoServerHandle implements AutoCloseable {    // 定义服务器端的服
     // NIO之中的Reactor模型重点在于所有的Channel需要向Selector之中进行注册
     this.selector = Selector.open(); // 获取Selector实例
     this.serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);  // 服务器端需要进行接收
-    System.out.println("服务器端程序启动，该程序在" + ServerInfo.PORT + "端口上进行监听...");
+    log.info("服务器端程序启动，该程序在{}端口上进行监听...", ServerInfo.PORT);
     this.clientHandle();
   }
 

@@ -1,4 +1,4 @@
-package com.uin.socket;
+package com.uin.socket.niotest;
 
 import cn.hutool.core.io.BufferUtil;
 import cn.hutool.core.io.IORuntimeException;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SocketNetworkService {
 
-  private final NioServer server = new NioServer(8080);
+  private static final NioServer server = new NioServer(8080);
 
-  public void sendMessage() {
+  public static void receiveMessage() {
     server.setChannelHandler((socketChannel -> {
       ByteBuffer readBuffer = ByteBuffer.allocate(1024 * 5);
       try {
@@ -36,8 +36,10 @@ public class SocketNetworkService {
           // 将缓冲区的数据读到bytes数组
           readBuffer.get(bytes);
           String body = StrUtil.utf8Str(bytes);
-          log.info("[{}]:{}",socketChannel.getRemoteAddress(),body);
-          doWrite(socketChannel,body);
+          log.info("[{}]:{}", socketChannel.getRemoteAddress(), body);
+          doWrite(socketChannel, body);
+        } else if (read < 0) {
+          socketChannel.close();
         }
       } catch (IOException e) {
         throw new IORuntimeException(e);
@@ -46,7 +48,7 @@ public class SocketNetworkService {
     server.listen();
   }
 
-  private void doWrite(SocketChannel socketChannel, String body) {
+  private static void doWrite(SocketChannel socketChannel, String body) {
     try {
       body = "收到消息：" + body;
       // 将缓冲数据写入渠道，返回给客户端
@@ -54,5 +56,9 @@ public class SocketNetworkService {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static void main(String[] args) {
+    receiveMessage();
   }
 }

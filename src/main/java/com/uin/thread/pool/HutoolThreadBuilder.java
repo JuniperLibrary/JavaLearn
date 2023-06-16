@@ -2,7 +2,10 @@ package com.uin.thread.pool;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.thread.ThreadUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,13 +29,14 @@ public class HutoolThreadBuilder {
     for (int i = 0; i < threadCount; i++) {
       String threadName = "async-thread-" + i;
       if (!checkThreadAlive(threadName)) {
+        // 开启异步线程
         future = ThreadUtil.execAsync(() -> {
           StopWatch watch = new StopWatch();
           watch.start(threadName + "sync");
           Thread.currentThread().setName(threadName);
-          importSyncTaskForQueue();
+          // todo task
           watch.stop();
-          log.info("异步任务执行完成:{},耗时:{}ms", threadName, watch.getTotalTimeMillis());
+          log.info("异步任务执行完成:{},耗时:{}s", threadName, watch.getTotalTimeMillis() / 1000);
         });
         msg.append("async 线程").append(threadName).append("开始执行...");
       } else {
@@ -43,11 +47,16 @@ public class HutoolThreadBuilder {
     return future;
   }
 
-  private void importSyncTaskForQueue() {
 
-  }
-
+  /**
+   * 检查是否开启，防止重复执行
+   *
+   * @param threadName
+   * @return
+   */
   private boolean checkThreadAlive(String threadName) {
-    return false;
+    Thread[] threads = ThreadUtil.getThreads();
+    long count = Arrays.stream(threads).filter(item -> item.getName().equals(threadName)).count();
+    return count > 0;
   }
 }

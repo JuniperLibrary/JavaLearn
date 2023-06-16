@@ -1,4 +1,4 @@
-package com.uin.common.utils.thread;
+package com.uin.thread;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;

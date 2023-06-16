@@ -1,7 +1,5 @@
-package com.uin.common.utils.thread;
+package com.uin.thread;
 
-import com.codahale.metrics.Timer;
-import com.uin.common.utils.metrics.MetricsMarker;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,18 +26,18 @@ public class QitWorkerThreadPool<T> {
           T obj = null;
           try {
             obj = queue.take();
-            try (Timer.Context ignored = MetricsMarker
-                .startTimer("threadPool", String.format("tps-%s", name))) {
-              consumer.accept(obj);
-            }
+//            try (Timer.Context ignored = MetricsMarker
+//                .startTimer("threadPool", String.format("tps-%s", name))) {
+//            }
+            consumer.accept(obj);
           } catch (Exception e) {
             log.error("take obj: {}, ", obj, e);
           }
         }
       });
     }
-    MetricsMarker.setGauge("threadPool", String.format("queueSize-%s", name),
-        () -> queues.stream().mapToInt(LinkedBlockingQueue::size).sum());
+//    MetricsMarker.setGauge("threadPool", String.format("queueSize-%s", name),
+//        () -> queues.stream().mapToInt(LinkedBlockingQueue::size).sum());
   }
 
   public void process(T obj) {

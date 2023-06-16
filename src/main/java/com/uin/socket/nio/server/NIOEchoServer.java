@@ -20,7 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 public class NIOEchoServer {
 
   public static void main(String[] args) throws Exception {
-    new EchoServerHandle();
+    try (EchoServerHandle echoServerHandle = new EchoServerHandle()) {
+    }
   }
 }
 

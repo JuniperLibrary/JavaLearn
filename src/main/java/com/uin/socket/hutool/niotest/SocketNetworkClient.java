@@ -1,4 +1,4 @@
-package com.uin.socket.niotest;
+package com.uin.socket.hutool.niotest;
 
 import cn.hutool.core.io.BufferUtil;
 import cn.hutool.core.lang.Console;
@@ -41,25 +41,25 @@ public class SocketNetworkClient {
     client.write(BufferUtil.createUtf8("HelloWorld..\n"));
 
     // 在控制台向服务器端发送数据
-//    Console.log("请输入发送的消息：");
-//    Scanner scanner = new Scanner(System.in);
-//    while (scanner.hasNextLine()) {
-//      String request = scanner.nextLine();
-//      if (request != null && request.trim().length() > 0) {
-//        client.write(BufferUtil.createUtf8(request));
-//      }
-//    }
-    for (int i = 0; i < 10; i++) {
-      int finalI = i;
-      ThreadUtil.execute(() -> {
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-        client.write(BufferUtil.createUtf8("消息:" + finalI));
-      });
+    Console.log("请输入发送的消息：");
+    Scanner scanner = new Scanner(System.in);
+    while (scanner.hasNextLine()) {
+      String request = scanner.nextLine();
+      if (request != null && request.trim().length() > 0) {
+        client.write(BufferUtil.createUtf8(request));
+      }
     }
+//    for (int i = 0; i < 10; i++) {
+//      int finalI = i;
+//      ThreadUtil.execute(() -> {
+//        try {
+//          Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//          throw new RuntimeException(e);
+//        }
+//        client.write(BufferUtil.createUtf8("消息:" + finalI));
+//      });
+//    }
 
   }
 

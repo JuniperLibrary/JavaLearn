@@ -1,4 +1,4 @@
-package com.uin.socket.aiotest;
+package com.uin.socket.hutool.aiotest;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.BufferUtil;
@@ -8,7 +8,9 @@ import cn.hutool.log.StaticLog;
 import cn.hutool.socket.aio.AioServer;
 import cn.hutool.socket.aio.AioSession;
 import cn.hutool.socket.aio.SimpleIoAction;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +34,7 @@ public class SocketNetworkService {
       public void doAction(AioSession session, ByteBuffer data) {
         Console.log(data);
 
-        if (false == data.hasRemaining()) {
+        if (!data.hasRemaining()) {
           StringBuilder response = StrUtil.builder()
               .append("HTTP/1.1 200 OK\r\n")
               .append("Date: ").append(DateUtil.formatHttpDate(DateUtil.date())).append("\r\n")
@@ -40,6 +42,7 @@ public class SocketNetworkService {
               .append("\r\n")
               .append("Hello Hutool socket");
           session.writeAndClose(BufferUtil.createUtf8(response));
+          session.read();
         } else {
           session.read();
         }

@@ -1,4 +1,4 @@
-package com.uin.socket.niotest;
+package com.uin.socket.hutool.niotest;
 
 import cn.hutool.core.io.BufferUtil;
 import cn.hutool.core.io.IORuntimeException;

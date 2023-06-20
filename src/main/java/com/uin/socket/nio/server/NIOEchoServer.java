@@ -78,21 +78,31 @@ class SocketClientChannelThread implements Runnable {
   }
 }
 
-class EchoServerHandle implements AutoCloseable {    // 定义服务器端的服务处理类
+/**
+ * 定义服务器端的服务处理类
+ */
+@Slf4j
+class EchoServerHandle implements AutoCloseable {
 
   private final ExecutorService executorService;
-  private final ServerSocketChannel serverSocketChannel; // 服务器端的通讯通道
+  // 服务器端的通讯通道
+  private final ServerSocketChannel serverSocketChannel;
   private final Selector selector;
 
   public EchoServerHandle() throws Exception {
-    this.executorService = Executors.newFixedThreadPool(5); // 当前的执行线程只允许有5个
-    this.serverSocketChannel = ServerSocketChannel.open(); // 打开服务器端连接通道
-    this.serverSocketChannel.configureBlocking(false); // 设置为非阻塞模式
+    // 当前的执行线程只允许有5个
+    this.executorService = Executors.newFixedThreadPool(5);
+    // 打开服务器端连接通道
+    this.serverSocketChannel = ServerSocketChannel.open();
+    // 设置为非阻塞模式
+    this.serverSocketChannel.configureBlocking(false);
     this.serverSocketChannel.bind(new InetSocketAddress(ServerInfo.PORT));
     // NIO之中的Reactor模型重点在于所有的Channel需要向Selector之中进行注册
-    this.selector = Selector.open(); // 获取Selector实例
-    this.serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);  // 服务器端需要进行接收
-    System.out.println("服务器端程序启动，该程序在" + ServerInfo.PORT + "端口上进行监听...");
+    // 获取Selector实例
+    this.selector = Selector.open();
+    // 服务器端需要进行接收
+    this.serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
+    log.info("服务器端程序启动，该程序在{}端口上进行监听...", ServerInfo.PORT);
     this.clientHandle();
   }
 

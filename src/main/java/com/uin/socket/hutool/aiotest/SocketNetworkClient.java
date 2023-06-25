@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
  * @author dingchuan
  */
 @Slf4j
-@Component
 public class SocketNetworkClient {
 
   private static final AioClient aioClient = new AioClient(new InetSocketAddress("127.0.0.1", 8899),

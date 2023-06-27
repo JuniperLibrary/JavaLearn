@@ -1,0 +1,34 @@
+@startuml
+header 示例
+participant "web service" as web
+participant "user service" as user
+participant "basic service" as basic
+
+group 会员升级
+      activate  web
+      web -> web: 获取当天满足的条件用户
+      note left :定时器
+      loop 1,n
+        web -> basic : 查询用户信息(RPC)
+        activate  basic
+        basic --> web : 用户信息
+        deactivate basic
+
+        opt 用户当前是会员
+          web o-> user : 发送通知短信(http)
+          activate user
+        end
+
+        alt 用户当前是大会员
+          web -> user:会员续约(http)
+          user --> web:返回结果
+        else 非会员
+          web -> user :升级会员(http)
+          user --> web:返回结果
+        end
+        deactivate user
+      end
+
+      deactivate web
+end
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+actor 用户 as user
+
+participant APP
+participant 后台
+participant 数据库
+
+activate user
+activate APP
+user -> APP :功能操作
+APP -> APP : 验证输入的数据
+activate 后台
+APP -> 后台 : 发送请求
+activate 数据库
+后台 -> 数据库 : 相应数据库操作
+数据库 --> 后台 : 返回结果
+deactivate 数据库
+后台 --> APP : 返回登陆结果
+deactivate 后台
+APP -> APP : 渲染页面/处理数据
+
+APP --> user : 返回结果给用户
+deactivate APP
+deactivate user
+@enduml

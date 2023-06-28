@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 /**
  * @author dingchuan
  */
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class SocketNetworkClient {

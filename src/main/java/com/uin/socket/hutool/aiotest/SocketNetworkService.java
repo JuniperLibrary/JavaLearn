@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
  * @author dingchuan
  */
 @Slf4j
-@Component
 public class SocketNetworkService {
   private static final AioServer aioServer = new AioServer(8899);
 

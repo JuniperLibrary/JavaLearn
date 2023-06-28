@@ -1,1 +1,7 @@
+
+logs/**
+target/**
+target/classes/com/uin/RateLimiter/config/WebMvcConfig.class
+
 /target/**
+

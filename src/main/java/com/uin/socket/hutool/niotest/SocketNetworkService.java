@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
  */
 @RequiredArgsConstructor
 @Slf4j
-@Component
 public class SocketNetworkService {
 
   private static final NioServer server = new NioServer(8080);

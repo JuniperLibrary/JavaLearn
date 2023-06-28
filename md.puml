@@ -1,0 +1,60 @@
+@startuml
+
+participant YlinkMarketDataAdapter as ada
+participant SocketManager as sm
+participant NioSocketChannel as nio
+participant SocketChannel as sc
+
+activate ada
+
+ada -> ada : 构造方法初始化
+
+  activate sm
+
+  loop
+    activate ada
+    ada -> sm : 启动一个线程执行doTask()
+    activate sm
+    sm -> sm : 选择器selector查询已有多少线程已就绪
+
+    alt select大于0
+      sm -> sm : 调用loadSckChlAdd()注册Selector,返回SelectionKey集合
+      activate sc
+      sm -> sc : SocketChannel注册选择器(Selector)并添加Selection.OP_READ
+      sc --> sm : return
+      deactivate sc
+
+      alt 如果SelectionKey集合不为空
+        activate sm
+        sm -> sm : 开始处理事件doEvent()
+        activate sc
+        sm -> sc : 调用doRead()方法读取数据
+        activate nio
+        sc --> nio : 将读取到的数据写到NioSocketChannel中的ByteBuffer
+        deactivate nio
+        deactivate sc
+        deactivate sm
+      end
+    end
+    deactivate sm
+    deactivate ada
+  end
+
+  activate ada
+  ada -> ada : 调用connect()方法
+  ada -> sm : 调用sendLoginMessage()
+  activate nio
+  sm -> nio : 调用addWriteMsg()
+  activate nio
+  nio -> nio : 调用addWriteMsg()
+  deactivate nio
+  nio -> nio: 调用addWriteMsg()
+  activate sc
+  nio -> sc: 调用registerEvent()
+  sc --> sm : return
+  deactivate sc
+  deactivate nio
+  deactivate ada
+
+deactivate ada
+@enduml

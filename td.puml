@@ -1,0 +1,71 @@
+@startuml
+actor user as user
+participant YlinkTradingAdapter as td
+participant SocketManager as sm
+participant SocketConnectionPool as pool
+participant BlockSocketFactory as bf
+participant BlockSocket as bs
+participant NioSocketChannel as nio
+participant SockChannel as sc
+
+activate td
+td -> td : 构造方法初始化
+activate pool
+td -> pool : 构建socket连接池
+activate bf
+pool -> bf:构建BlockSocket工厂
+bf --> td : return
+deactivate bf
+deactivate pool
+
+
+  loop
+    activate sm
+    td -> sm : 启动一个线程执行doTask()方法
+    sm -> sm : doTask()
+    activate sm
+    alt 是否有线程启动
+      sm -> sm : 2s查询多路复用选择器的个数
+      alt 如果个数大于0
+        activate sm
+        sm -> sm : 调用loadSckChlAdd()来添加socket
+        activate sc
+        sm -> sc : 将selector注册到SockChannel中
+        alt SelectionKey不为空
+          activate sm
+          sm -> sm : doEvent()
+            alt SelectionKey校验通过并且可以读
+              activate nio
+              sm -> nio : doRead
+            else SelectionKey校验通过并且可以写
+              sm -> nio : doWrite
+            end
+          deactivate sm
+        end
+        deactivate sc
+      end
+      deactivate sc
+      deactivate sm
+    end
+    deactivate sm
+  end
+
+activate user
+activate td
+user -> td : 调用connect方法
+td -> td : 调用SendLoginMessage
+activate sm
+td -> sm : addWriteMsg
+activate nio
+sm -> nio: addWriteMsg
+nio -> nio: addWriteMsg
+activate sc
+nio -> sc : registerEvent
+
+sc --> sm : return
+
+
+
+
+
+@enduml

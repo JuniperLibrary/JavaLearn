@@ -11,3 +11,4 @@ spring:
         max-idle: 8
         max-wait: -1
         min-idle: 0
+

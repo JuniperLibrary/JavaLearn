@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+'start
+':ClickServlet.handleRequest();
+':new page;
+'if (Page.onSecurityCheck) then (true)
+'  :Page.onInit();
+'  if (isForward?) then (no)
+'    :Process controls;
+'    if (continue processing?) then (no)
+'      stop
+'    endif
+'
+'    if (isPost?) then (yes)
+'      :Page.onPost();
+'    else (no)
+'      :Page.onGet();
+'    endif
+'    :Page.onRender();
+'  endif
+'else (false)
+'endif
+'
+'if (do redirect?) then (yes)
+'  :redirect process;
+'else
+'  if (do forward?) then (yes)
+'    :Forward request;
+'  else (no)
+'    :Render page template;
+'  endif
+'endif
+'
+'stop
+
+start
+:新增TD/MD连接账户;
+  if (连接测试成功)
+    :新增成功;
+  else (连接失败)
+    :新增失败;
+  endif
+stop
+
+@enduml

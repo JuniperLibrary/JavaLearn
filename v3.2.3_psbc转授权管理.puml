@@ -1,0 +1,44 @@
+@startuml
+
+autonumber
+actor user as user
+participant client
+participant system
+participant pg
+participant redis
+activate user
+activate system
+user -> system : 新增转授权配置
+activate system
+system -> system : 参数校验
+  alt 转授权类型是BOOK
+    system -> system : 重复性校验
+  else 转授权类型是AUDIT
+    system -> system : 初始化工作流信息、保存到本地缓存(workFlowId->Name)(workFlowId->Code)
+  else 转授权类型是USER
+    system -> system : 填充消息参数
+  end
+activate pg
+system -> pg : 分页查询转授权配置并检查有没有相同的BOOK/AUDIT
+system -> system : 检查是否EXPIRE,对于新增的记录状态都是启用
+system -> pg :  用户迁移，策略移交、投组移交,用户迁移成功，强制用户登出
+activate redis
+system -> redis : 清除redis中转授权配置信息
+deactivate system
+deactivate pg
+deactivate redis
+
+
+autonumber
+user -> system: 启用/禁止转授权配置
+system -> pg : 参数校验，根据转授权VO查询转授权配置信息
+system -> system : 初始化启用、禁用、修改的提示信息
+system -> pg: 并更新转授权的状态
+
+autonumber
+user -> system: 编辑转授权配置
+system -> pg : 参数校验，根据转授权VO查询转授权配置信息
+system -> system : 初始化启用、禁用、修改的提示信息
+system -> pg: 检验状态是否过期并更新转授权的状态
+system ->redis:清除redis中的转授权的配置信息，保存、编辑、启用成功，清空原用配置，定时任务会重新加载
+@enduml

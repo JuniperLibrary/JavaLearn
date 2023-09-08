@@ -1,0 +1,53 @@
+@startuml
+skin rose
+group tdp 我的审批-利率互换对话报价点击成交确认
+Actor -> RftSwapConfirmStateDomainServiceImpl: Xswap对话报价待成交点击成交时 riskCheck()风控检查
+
+RftSwapConfirmStateDomainServiceImpl -> RiskResponseContextServiceImpl: 风控校验并处理风控响应
+alt 如果风控触发审批流
+  RiskResponseContextServiceImpl -> RiskResponseContextServiceImpl : sendToWorkflow()触发工作流
+end
+RiskResponseContextServiceImpl -> RiskResponseWorkflowDomainServiceImpl : sendWorkflowStartEvent()响应工作流开启的事件
+RiskResponseWorkflowDomainServiceImpl -> sendWorkflowStartEvent : 遍历风控响应的结果集合找到风控响应动作为WORKFLOW,开始创建WorkFlowOrderStartVO
+sendWorkflowStartEvent -> System: 遍历workflowOrderStartVOList给System发送SYS_WORKFLOW_ORDER_START事件
+end
+group System
+System -> SystemEventBusHandler : 处理审批流（sys启动审批流）事件
+SystemEventBusHandler -> WorkflowOrderWebServiceHandler:startWorkflowOrder开启审批流
+
+WorkflowOrderWebServiceHandler -> startWorkflowOrder: 根据编码查询审批流程定义编码相同的最大版本号记录
+startWorkflowOrder -> addWorkflowOrderEntity: 根据审批流程定义对象和当前用户对象生成审批单并落库
+addWorkflowOrderEntity->addWorkflowOrderNodeEntityList: 根据审批单和审批流程定义对象的子节点集合，转换为审批单的子节点对象，并落库
+addWorkflowOrderNodeEntityList --> WorkflowOrderWebServiceHandler
+WorkflowOrderWebServiceHandler -> WorkflowOrderWebServiceHandler: 根据审批流设置子节点id集合，查询审批流设置子节点检查项集合，并收集审批流检查项对象，并检查tdp发送过来的数据是否存在该检查项
+WorkflowOrderWebServiceHandler -> WorkflowEngineHandler : 启动流程startWorkflowEngine
+WorkflowEngineHandler->WorkflowEngineDaoServiceImpl:根据审批单的审批流编号、审批编号和传入引擎的变量数据，启动流程实例
+WorkflowEngineDaoServiceImpl --> WorkflowOrderWebServiceHandler:return 流程实例的ID
+WorkflowOrderWebServiceHandler -> WorkflowOrderWebServiceHandler:根据审批单的ID和流程实例的ID，落库并绑定审批单和流程实例的关系
+end
+group 完成审批
+System -> WorkflowOrderWebServiceHandler : approveWorkflowOrderDetail()完成审批
+WorkflowOrderWebServiceHandler -> WorkflowOrderWebServiceHandler : 1.根据审批单的ID查询审批单 2.根据审批单的引擎流程实例id和当前用户查询审批人对应的任务 3.根据登录人的ID、审批流ID、引擎ID查询审批流配置信息并转换为任务授权人4.查询审批单的子节点，根据会签或者是任签的规则处理子节点并更新数据库5.发送消息
+WorkflowOrderWebServiceHandler->NoticeTdpStrategy:sendMessage()通过eventbus发送审批流结束消息
+NoticeTdpStrategy->WorkflowExecutionServiceImpl:handleEvent
+WorkflowExecutionServiceImpl -> TdpEventBusProducer : publish RFT_QUOTE_EXECUTION_INNER_TDP
+TdpEventBusHandler->RftStatusMachineServiceImpl:replyExecution()
+RftStatusMachineServiceImpl-->RftSwapConfirmStateDomainServiceImpl:return
+end
+group 取消审批
+System -> WorkflowOrderWebServiceHandler: cancelWorkflowOrder 取消审批
+WorkflowOrderWebServiceHandler -> WorkflowOrderWebServiceHandler:revokeMyOrder()撤回审批
+WorkflowOrderWebServiceHandler ->WorkflowOrderWebServiceHandler:displayMyInitiation()并通过websocket发消息
+WorkflowOrderWebServiceHandler --> Actor : return
+end
+group 撤回审批
+System -> WorkflowOrderWebServiceHandler: revokeMyOrder()撤回审批，并更新数据库审批的状态
+WorkflowOrderWebServiceHandler -> WorkflowEngineHandler : stopProcessInstanceByKey()终止流程实例
+WorkflowOrderWebServiceHandler -> RevokeStrategy: sendMessage()并根据审批单的编号删除redis中的审批单
+RevokeStrategy --> Actor: return
+end
+
+group 终止单个/全部审批
+System -> WorkflowOrderWebServiceHandler: stopProcessInstanceByKey()查询审批单、终止流程实例、更新审批状态并更新审批单的子节点为审批终止
+end
+@enduml

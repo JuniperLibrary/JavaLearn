@@ -1,0 +1,36 @@
+@startuml
+actor user
+participant "pm-td" as td
+participant "pm-tdfront" as tdfront
+participant "pm-md" as md
+participant "pm-mdfront" as mdfront
+participant "pm-system" as system
+participant pg
+
+user -> td : 新增/编辑(TD/MD)连接账户
+system -> system : 项目初始化将数据load到redis中
+td -> system : 获取雁联通用配置信息
+system --> td : return
+user -> td : 连接测试(待定)
+td -> tdfront : 根据柜台先去数据库中查询
+  alt 连接已经存在
+     td --> user : 该接口目前有账号正在使用
+  else 连接不存在
+     td -> tdfront: 发送消息TD_INTERFACE_CONNECT
+     tdfront-> tdfront : 连接动作
+     tdfront --> td : return
+     td -> td : 执行连接逻辑，过2s去redis查看状态，如果未通过返回SYS_CFFEX_TEST_LOGIN_ERROR，如果通过，就断开连接，返回NORMAL
+     td --> user : return
+  end
+alt 连接测试通过
+  td -> pg:校验唯一性、从redis获取雁联的通用信息并落库
+  td --> user : return
+else 不通过
+  td --> user: 连接测试异常，请先配置通用信息
+end
+
+user -> td :修改密码
+user -> td: 从redis获取账号连接状态,不能修改连接中的账户，前端校验通过之后
+user -> td: 修改密码
+td --> user :修改成功
+@enduml

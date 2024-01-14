@@ -9,12 +9,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dingchuan
  */
 public class RateLimiterSimpleWindow {
-  // 阈值
+
+  /**
+   * 阈值
+   */
   private static Integer QPS = 2;
-  // 时间窗口（毫秒）
+  /**
+   * 时间窗口（毫秒）
+   */
   private static long TIME_WINDOWS = 1000;
-  // 计数器
-  private static AtomicInteger REQ_COUNT = new AtomicInteger();
+  /**
+   * 计数器
+   */
+  private static final AtomicInteger REQ_COUNT = new AtomicInteger();
 
   private static long START_TIME = System.currentTimeMillis();
 

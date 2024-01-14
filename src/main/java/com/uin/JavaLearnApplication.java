@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GuavaLearnApplication {
+public class JavaLearnApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(GuavaLearnApplication.class, args);
+    SpringApplication.run(JavaLearnApplication.class, args);
   }
 
 }

@@ -87,5 +87,31 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+
+    <!--xls-->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.2.3</version> <!-- 使用最新版本 -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.2.3</version> <!-- 使用最新版本 -->
+    </dependency>
+
+
+    <!--csv-->
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>5.7.1</version> <!-- 使用最新版本 -->
+    </dependency>
+
+
+
+
+
   </dependencies>
 </project>

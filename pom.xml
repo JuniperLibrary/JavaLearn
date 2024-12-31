@@ -9,9 +9,9 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.uin</groupId>
-  <artifactId>guava-hutool-learn</artifactId>
+  <artifactId>JavaLearn</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>guava-learn</name>
+  <name>JavaLearn</name>
   <description>guava-learn</description>
   <properties>
     <java.version>11</java.version>

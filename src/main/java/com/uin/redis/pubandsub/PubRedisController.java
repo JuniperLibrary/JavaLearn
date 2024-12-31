@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class PubRedisController {
 
-  private final RedisTemplate<String, Object> redisTemplate;
+  private final RedisTemplate redisTemplate;
 
   @GetMapping("/test")
   public void test() {

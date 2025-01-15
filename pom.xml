@@ -12,7 +12,7 @@
   <artifactId>JavaLearn</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>JavaLearn</name>
-  <description>guava-learn</description>
+  <description>java-learn</description>
   <properties>
     <java.version>11</java.version>
   </properties>
